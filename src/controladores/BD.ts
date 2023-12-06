@@ -46,20 +46,33 @@ export default{
         await video.likes.forEach(async element => {
             if (element == usuario.usuario) { 
                 console.log("Ya likeaste el video")
-                 _res.status(200).send("ya likeaste el video")
                  estaRepetido = true
             }
         });
 
         await video.dislikes.forEach(async element => {
             if (element == usuario.usuario) { 
-                console.log("Ya likeaste el video")
-                 _res.status(200).send("ya likeaste el video")
+                console.log("Ya dislikeaste el video")
                  estaRepetido = true
             }
         });
 
-        if(estaRepetido){return}
+        if(estaRepetido){
+            const index = video.likes.indexOf(usuario.usuario);
+            if (index !== -1) {
+            video.likes.splice(index, 1);
+            }
+            console.log(video.likes)
+            const update = await modeloVideo.findOneAndUpdate(
+                {
+                    titulo: _req.params.titulo
+                },
+            {likes : video.likes})
+             _res.status(200).send(String(video.likes.length))
+             return
+        }
+        
+        else{
             console.log("oasdk")
             console.log(usuario.usuario)
             video.likes.push(usuario.usuario)
@@ -69,6 +82,8 @@ export default{
                 },
             {likes : video.likes})
             return _res.status(200).send(String(video.likes.length))
+        }
+        
     },
 
     dislikearUnVideo: async(_req: express.Request, _res: express.Response) => {
@@ -84,29 +99,45 @@ export default{
         await video.likes.forEach(async element => {
             if (element == usuario.usuario) { 
                 console.log("Ya likeaste el video")
-                 _res.status(200).send("ya likeaste el video")
+                
                  estaRepetido = true
             }
         });
         
         await video.dislikes.forEach(async element => {
             if (element == usuario.usuario) { 
-                console.log("Ya likeaste el video")
-                 _res.status(200).send("ya likeaste el video")
+                console.log("Ya dislikeaste el video")
+                
                  estaRepetido = true
             }
         });
 
-        if(estaRepetido){return}
+        if(estaRepetido){
+            const index = video.dislikes.indexOf(usuario.usuario);
+            if (index !== -1) {
+            video.dislikes.splice(index, 1);
+            }
+            console.log(video.dislikes)
+            const update = await modeloVideo.findOneAndUpdate(
+                {
+                    titulo: _req.params.titulo
+                },
+            {dislikes : video.dislikes})
+             _res.status(200).send(String(video.dislikes.length))
+             return
+        }
+        else{
             console.log("oasdk")
             console.log(usuario.usuario)
-            video.likes.push(usuario.usuario)
+            video.dislikes.push(usuario.usuario)
             const update = await modeloVideo.findOneAndUpdate(
                 {
                     titulo: _req.params.titulo
                 },
             {dislikes : video.dislikes})
             return _res.status(200).send(String(video.dislikes.length)) 
+        }
+            
     },
 
     filtrarUnVideo: async (_req: express.Request, _res: express.Response) => {
@@ -165,7 +196,7 @@ export default{
         likesAux.forEach(async likes =>{
               if (likes == usuario.usuario) { 
                    console.log("Ya likeaste el comentario")
-                     _res.status(200).send("ya likeaste el comentario")
+                     
                      estaRepetido = true
                 }
             })           
@@ -174,13 +205,26 @@ export default{
             dislikesAux.forEach(async dislike =>{
                 if (dislike == usuario.usuario) { 
                     console.log("Ya dislikeaste el comentario")
-                     _res.status(200).send("ya dislikeaste el comentario")
+                     
                      estaRepetido = true
                 }
             }) 
         
 
-        if(estaRepetido){return}
+        if(estaRepetido){
+            const index = video.comentarios[Number(_req.params.id)].like.indexOf(usuario.usuario);
+            if (index !== -1) {
+                video.comentarios[Number(_req.params.id)].like.splice(index, 1);
+            }
+            const update = await modeloVideo.findOneAndUpdate(
+                {
+                    titulo: _req.params.titulo
+                },
+            {comentarios : comentariosAux})
+            _res.status(200).send(String(video.comentarios[Number(_req.params.id)].like.length))
+             return
+        }
+        else{
             console.log("oasdk")
             console.log(usuario.usuario)
             comentariosAux[Number(_req.params.id)].like.push(usuario.usuario)
@@ -191,22 +235,70 @@ export default{
             {comentarios : comentariosAux})
             console.log(video.comentarios[Number(_req.params.id)].like.length)
             return _res.status(200).send(String(video.comentarios[Number(_req.params.id)].like.length))
-
+        }
     },
 
     dislikearUnComentario: async(_req: express.Request, _res: express.Response) => {
-        const asd = await modeloVideo.findOne({titulo: _req.params.titulo})
-        if(!asd){
+        const video = await modeloVideo.findOne({titulo: _req.params.titulo})
+        console.log("likearUnVideo: ")
+        console.log(_req.headers.authorization)
+        const usuario = usuarioPorToken(_req.headers.authorization)
+        let estaRepetido : Boolean = false
+        let comentariosAux : Comentario[] = video!.comentarios
+
+        if(!video){
             return _res.status(404).send("NO")
         }
-        //asd.comentarios[Number(_req.params.id)].dislike = asd.comentarios[Number(_req.params.id)].dislike +1
-        const update = await modeloVideo.findOneAndUpdate(
-            {
-                titulo: _req.params.titulo
-            },
-        {comentarios : asd?.comentarios})
-        _res.status(200).send(update)
+        
+        let comentario = comentariosAux[Number(_req.params.id)]
+        let likesAux : Array<string> = comentario.like
+        console.log("likesaux:")
+        console.log(likesAux)
+        likesAux.forEach(async likes =>{
+              if (likes == usuario.usuario) { 
+                   console.log("Ya likeaste el comentario")
+                     
+                     estaRepetido = true
+                }
+            })           
+    
+            let dislikesAux : Array<string> = comentario.dislike
+            dislikesAux.forEach(async dislike =>{
+                if (dislike == usuario.usuario) { 
+                    console.log("Ya dislikeaste el comentario")
+                     
+                     estaRepetido = true
+                }
+            }) 
+        
 
+        if(estaRepetido){
+            const index = video.comentarios[Number(_req.params.id)].dislike.indexOf(usuario.usuario);
+            if (index !== -1) {
+                video.comentarios[Number(_req.params.id)].dislike.splice(index, 1);
+            }
+            const update = await modeloVideo.findOneAndUpdate(
+                {
+                    titulo: _req.params.titulo
+                },
+            {comentarios : comentariosAux})
+            _res.status(200).send(String(video.comentarios[Number(_req.params.id)].dislike.length))
+             return
+        }
+        else{
+            console.log("oasdk")
+            console.log(usuario.usuario)
+            comentariosAux[Number(_req.params.id)].dislike.push(usuario.usuario)
+            const update = await modeloVideo.findOneAndUpdate(
+                {
+                    titulo: _req.params.titulo
+                },
+            {comentarios : comentariosAux})
+            console.log(video.comentarios[Number(_req.params.id)].dislike.length)
+            return _res.status(200).send(String(video.comentarios[Number(_req.params.id)].dislike.length))
+
+        }
+            
     },
 
     getUsuario: async(_req: express.Request, _res: express.Response) => {
