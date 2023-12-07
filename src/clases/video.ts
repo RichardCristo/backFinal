@@ -10,8 +10,9 @@ export class Video{
     comentarios: Array<Comentario>
     miniatura: String
     publicador: String
+    link: String
     
-    constructor(_titulo: String, _visitas: number, _likes: Array<String>, _dislikes: Array<String>, _etiquetas: Array<string>, _comentarios: Array<Comentario>, _miniatura: String, _publicador: String){
+    constructor(_titulo: String, _visitas: number, _likes: Array<String>, _dislikes: Array<String>, _etiquetas: Array<string>, _comentarios: Array<Comentario>, _miniatura: String, _publicador: String, _link: String ){
         this.titulo =_titulo;
         this.visitas =_visitas;
         this.likes = _likes;
@@ -19,7 +20,8 @@ export class Video{
         this.etiquetas = _etiquetas;
         this.comentarios = _comentarios
         this.miniatura = _miniatura;
-        this.publicador = _publicador
+        this.publicador = _publicador;
+        this.link = _link
     }
     
 }

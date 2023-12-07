@@ -32,6 +32,8 @@ class Video{
     @prop()
     public publicador!: String
 
+    @prop()
+    public link!: String
 }
 
 export const modeloVideo = getModelForClass(Video)
