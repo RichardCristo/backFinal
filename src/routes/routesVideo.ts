@@ -38,6 +38,8 @@ routerVideo.get("/getVideos", BD.getVideos)
 
 routerVideo.get("/etiqueta/:etiqueta", BD.filtrarUnVideo)
 
+routerVideo.get("/videosDelUsuario/:usuario", BD.videosDelUsuario)
+
 routerVideo.patch("/like/:titulo", verificarClave,BD.likearUnVideo)
 
 routerVideo.patch("/dislike/:titulo",verificarClave, BD.dislikearUnVideo)

@@ -304,8 +304,17 @@ export default{
     getUsuario: async(_req: express.Request, _res: express.Response) => {
         const usuario = await modeloUsuario.findOne({usuario: _req.params.usuario})
         return _res.status(200).send(usuario)
+    },
+
+    videosDelUsuario: async(_req: express.Request, _res: express.Response) => {
+        try {
+            const videos = await modeloVideo.find({ publicador: _req.params.usuario });
+            
+            console.log(videos);
+            return _res.status(200).send(videos);
+        } catch (error) {
+            return _res.status(500).send({ error: 'Hubo un error al obtener los videos del usuario.' });
+        }
     }
-
-
 }
 
